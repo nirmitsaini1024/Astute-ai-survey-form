@@ -144,7 +144,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-black text-white p-8">
       <div className="max-w-3xl mx-auto">
-        <div className="mb-12 flex items-center gap-4">
+        <div className="mb-6 flex items-center gap-4">
           <Image
             src={Logooo}
             height={40}
