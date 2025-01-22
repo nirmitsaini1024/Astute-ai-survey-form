@@ -232,13 +232,13 @@ export default function Home() {
                             <FormControl>
                               <RadioGroupItem value="yes" />
                             </FormControl>
-                            <FormLabel className="font-normal text-base">Yes</FormLabel>
+                            <FormLabel className="font-normal text-base text-zinc-400">Yes</FormLabel>
                           </FormItem>
                           <FormItem className="flex items-center space-x-3 space-y-0">
                             <FormControl>
                               <RadioGroupItem value="no" />
                             </FormControl>
-                            <FormLabel className="font-normal text-base">No</FormLabel>
+                            <FormLabel className="font-normal text-base text-zinc-400">No</FormLabel>
                           </FormItem>
                         </RadioGroup>
                       </FormControl>
@@ -260,7 +260,7 @@ export default function Home() {
                               <RadioGroup
                                 onValueChange={field.onChange}
                                 defaultValue={field.value}
-                                className="flex flex-col space-y-2 mt-4"
+                                className="flex flex-col space-y-2 mt-4 text-zinc-400"
                               >
                                 {[
                                   "Attracting more visitors",
@@ -286,14 +286,34 @@ export default function Home() {
                         control={form.control}
                         name="businessIndustry"
                         render={({ field }) => (
-                          <FormItem>
+                            <FormItem>
                             <FormLabel className="text-lg">What is your business industry?</FormLabel>
                             <FormControl>
-                              <Input
-                                placeholder="Enter your business industry"
-                                {...field}
-                                className="bg-gray-900 border-gray-700"
-                              />
+                              <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="flex flex-col space-y-2 mt-4 text-zinc-400"
+                              >
+                                {[
+                                   "Technology",
+                                   "E-commerce",
+                                   "Healthcare",
+                                   "Education",
+                                   "Finance",
+                                   "Real Estate",
+                                   "Entertainment",
+                                   "Travel and Hospitality",
+                                   "Retail",
+                                   "Other",
+                                ].map((option) => (
+                                  <FormItem key={option} className="flex items-center space-x-3 space-y-0">
+                                    <FormControl>
+                                      <RadioGroupItem value={option} />
+                                    </FormControl>
+                                    <FormLabel className="font-normal text-base">{option}</FormLabel>
+                                  </FormItem>
+                                ))}
+                              </RadioGroup>
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -304,14 +324,33 @@ export default function Home() {
                         control={form.control}
                         name="targetAudience"
                         render={({ field }) => (
-                          <FormItem>
+                         
+                            <FormItem>
                             <FormLabel className="text-lg">Who is your target audience?</FormLabel>
                             <FormControl>
-                              <Textarea
-                                placeholder="Describe your target audience"
-                                {...field}
-                                className="bg-gray-900 border-gray-700 min-h-[100px]"
-                              />
+                              <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="flex flex-col space-y-2 mt-4 text-zinc-400"
+                              >
+                                {[
+                                   "Businesses (B2B)",
+                                   "Individual Consumers (B2C)",
+                                   "Students",
+                                   "Professionals",
+                                   "Small and Medium Enterprises (SMEs)",
+                                   "Large Corporations",
+                                   "Non-Profit Organizations",
+                                   "Other",
+                                ].map((option) => (
+                                  <FormItem key={option} className="flex items-center space-x-3 space-y-0">
+                                    <FormControl>
+                                      <RadioGroupItem value={option} />
+                                    </FormControl>
+                                    <FormLabel className="font-normal text-base">{option}</FormLabel>
+                                  </FormItem>
+                                ))}
+                              </RadioGroup>
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -338,13 +377,13 @@ export default function Home() {
                                   <FormControl>
                                     <RadioGroupItem value="yes" />
                                   </FormControl>
-                                  <FormLabel className="font-normal text-base">Yes</FormLabel>
+                                  <FormLabel className="font-normal text-base text-zinc-400">Yes</FormLabel>
                                 </FormItem>
                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                   <FormControl>
                                     <RadioGroupItem value="no" />
                                   </FormControl>
-                                  <FormLabel className="font-normal text-base">No</FormLabel>
+                                  <FormLabel className="font-normal text-base text-zinc-400">No</FormLabel>
                                 </FormItem>
                               </RadioGroup>
                             </FormControl>
@@ -408,13 +447,13 @@ export default function Home() {
                                   <FormControl>
                                     <RadioGroupItem value="yes" />
                                   </FormControl>
-                                  <FormLabel className="font-normal text-base">Yes</FormLabel>
+                                  <FormLabel className="font-normal text-base text-zinc-400">Yes</FormLabel>
                                 </FormItem>
                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                   <FormControl>
                                     <RadioGroupItem value="no" />
                                   </FormControl>
-                                  <FormLabel className="font-normal text-base">No</FormLabel>
+                                  <FormLabel className="font-normal text-base text-zinc-400">No</FormLabel>
                                 </FormItem>
                               </RadioGroup>
                             </FormControl>
@@ -439,7 +478,7 @@ export default function Home() {
                                 control={form.control}
                                 name="creationChallenges"
                                 render={({ field }) => (
-                                  <FormItem className="flex items-center space-x-3 space-y-0">
+                                  <FormItem className="flex items-center space-x-3 space-y-0 text-zinc-400">
                                     <FormControl>
                                       <Checkbox
                                         checked={field.value?.includes(challenge)}
