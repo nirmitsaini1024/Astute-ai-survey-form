@@ -1,4 +1,9 @@
-import mongoose from "mongoose"
+import mongoose, { Connection } from "mongoose"
+
+// Extend the global object with mongoose
+declare global {
+  var mongoose: { conn: Connection | null; promise: Promise<Connection> | null };
+}
 
 const MONGODB_URI = process.env.MONGODB_URI
 
@@ -22,8 +27,8 @@ async function dbConnect() {
       bufferCommands: false,
     }
 
-    cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
-      return mongoose
+    cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongooseInstance) => {
+      return mongooseInstance.connection // Ensure we only return the connection, not the full mongoose instance
     })
   }
 
@@ -38,4 +43,3 @@ async function dbConnect() {
 }
 
 export default dbConnect
-
