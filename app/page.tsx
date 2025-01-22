@@ -16,10 +16,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
-// import { useToast } from "@/components/ui/use-toast"
-// import { Toast } from "@/components/ui/toast"
 import Logooo from "@/assets/logooo.png";
 import Image from "next/image";
+import toast, { Toaster } from "react-hot-toast";
+
+
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -43,7 +44,6 @@ const formSchema = z.object({
 
 export default function Home() {
   const [step, setStep] = useState(1);
-  // const { toast } = useToast()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -70,34 +70,22 @@ export default function Home() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(values), // This should include the name field
+        body: JSON.stringify(values), 
       });
 
       if (response.ok) {
         console.log("Form submitted successfully");
-        alert("Form submitted successfully");
-        // <p className="text-white">Form submitted successfully</p>
+        toast.success('Successfully toasted!')
 
         form.reset();
         setStep(1);
       } else {
-        console.error("Form submission failed");
-        alert("Form submission failed");
-        // toast({
-        //   title: "Error",
-        //   description: "There was a problem submitting your form. Please try again.",
-        //   variant: "destructive",
-        //   duration: 5000,
-        // })
+        toast.error("Form submission failed")
+
       }
     } catch (error) {
-      console.error("Error submitting form:", error);
-      // toast({
-      //   title: "Error",
-      //   description: "There was a problem submitting your form. Please try again.",
-      //   variant: "destructive",
-      //   duration: 5000,
-      // })
+      toast.error("Error submitting form")
+
     }
   };
 
@@ -610,7 +598,6 @@ export default function Home() {
           </form>
         </Form>
       </div>
-      {/* <Toast /> */}
     </div>
   );
 }
