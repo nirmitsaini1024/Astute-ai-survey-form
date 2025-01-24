@@ -12,6 +12,8 @@ const BusinessFormSchema = new mongoose.Schema(
     targetAudience: { type: String },
     challenges: [{ type: String }],
     implementedStrategies: { type: String, enum: ["yes", "no"] },
+    campaigns: { type: String, enum: ["yes", "no"] },
+    digitalperformance: { type: String, enum: ["yes", "no"] },
     joinWishlist: { type: String, enum: ["yes", "no"] },
     wantWebsite: { type: String, enum: ["yes", "no"] },
     creationChallenges: [{ type: String }],
