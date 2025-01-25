@@ -7,8 +7,8 @@ import * as z from "zod"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Checkbox } from "@/components/ui/checkbox"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import Logooo from "@/assets/logooo.png"
 import Image from "next/image"
 import toast, { Toaster } from "react-hot-toast"
@@ -19,29 +19,27 @@ const formSchema = z.object({
   email: z.string().email("Invalid email address"),
   phone: z.string().regex(/^\+?[\d\s-()]{10,}$/, "Invalid phone number"),
   hasWebsite: z.enum(["yes", "no"]),
-
-  // Website owners fields
-  websiteUse: z.string().optional(),
-  businessIndustry: z.string().optional(),
-  targetAudience: z.string().optional(),
+  websiteUse: z.array(z.string()).optional(),
+  websiteUseOther: z.string().optional(),
+  businessIndustry: z.array(z.string()).optional(),
+  businessIndustryOther: z.string().optional(),
+  targetAudience: z.array(z.string()).optional(),
+  targetAudienceOther: z.string().optional(),
   challenges: z.array(z.string()).optional(),
   implementedStrategies: z.enum(["yes", "no"]).optional(),
   campaigns: z.enum(["yes", "no"]).optional(),
   digitalperformance: z.enum(["yes", "no"]).optional(),
   joinWishlist: z.enum(["yes", "no"]).optional(),
-
-  // Non-website owners fields
   wantWebsite: z.enum(["yes", "no"]).optional(),
   creationChallenges: z.array(z.string()).optional(),
-  businessIndustryOther: z.string().optional(),
-  websiteUseOther: z.string().optional(),
-  targetAudienceOther: z.string().optional(),
 })
+
+type FormValues = z.infer<typeof formSchema>
 
 export default function Home() {
   const [step, setStep] = useState(1)
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
@@ -49,12 +47,15 @@ export default function Home() {
       email: "",
       phone: "",
       hasWebsite: "no",
+      websiteUse: [],
+      businessIndustry: [],
+      targetAudience: [],
       challenges: [],
       creationChallenges: [],
     },
   })
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: FormValues) => {
     if (step !== 2) {
       setStep(2)
       return
@@ -71,7 +72,6 @@ export default function Home() {
 
       if (response.ok) {
         toast.success("Form submitted successfully")
-
         form.reset()
         setStep(1)
       } else {
@@ -179,7 +179,6 @@ export default function Home() {
                     </FormItem>
                   )}
                 />
-
                 <FormField
                   control={form.control}
                   name="email"
@@ -193,7 +192,6 @@ export default function Home() {
                     </FormItem>
                   )}
                 />
-
                 <FormField
                   control={form.control}
                   name="phone"
@@ -249,41 +247,49 @@ export default function Home() {
                       <FormField
                         control={form.control}
                         name="websiteUse"
-                        render={({ field }) => (
+                        render={() => (
                           <FormItem>
-                            <FormLabel className="text-lg">What is the primary use of your website?</FormLabel>
-                            <FormControl>
-                              <RadioGroup
-                                onValueChange={(value) => {
-                                  field.onChange(value)
-                                  if (value !== "Other") {
-                                    form.setValue("websiteUseOther", "")
-                                  }
-                                }}
-                                value={field.value}
-                                className="flex flex-col space-y-2 mt-4 text-zinc-400"
-                              >
-                                {[
-                                  "Attracting more visitors",
-                                  "Generating leads or sales",
-                                  "Sharing information about your business",
-                                  "Other",
-                                ].map((option) => (
-                                  <FormItem key={option} className="flex items-center space-x-3 space-y-0">
-                                    <FormControl>
-                                      <RadioGroupItem value={option} />
-                                    </FormControl>
-                                    <FormLabel className="font-normal text-base">{option}</FormLabel>
-                                  </FormItem>
-                                ))}
-                              </RadioGroup>
-                            </FormControl>
+                            <FormLabel className="text-lg">
+                              What is the primary use of your website? (Select all that apply)
+                            </FormLabel>
+                            <div className="space-y-2 mt-4">
+                              {[
+                                "Attracting more visitors",
+                                "Generating leads or sales",
+                                "Sharing information about your business",
+                                "Other",
+                              ].map((item) => (
+                                <FormField
+                                  key={item}
+                                  control={form.control}
+                                  name="websiteUse"
+                                  render={({ field }) => {
+                                    return (
+                                      <FormItem key={item} className="flex flex-row items-start space-x-3 space-y-0">
+                                        <FormControl>
+                                          <Checkbox
+                                            checked={field.value?.includes(item)}
+                                            onCheckedChange={(checked) => {
+                                              const currentValue = field.value || []
+                                              return checked
+                                                ? field.onChange([...currentValue, item])
+                                                : field.onChange(currentValue.filter((value) => value !== item))
+                                            }}
+                                          />
+                                        </FormControl>
+                                        <FormLabel className="font-normal text-base text-zinc-400">{item}</FormLabel>
+                                      </FormItem>
+                                    )
+                                  }}
+                                />
+                              ))}
+                            </div>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
 
-                      {form.watch("websiteUse") === "Other" && (
+                      {form.watch("websiteUse")?.includes("Other") && (
                         <FormField
                           control={form.control}
                           name="websiteUseOther"
@@ -306,47 +312,55 @@ export default function Home() {
                       <FormField
                         control={form.control}
                         name="businessIndustry"
-                        render={({ field }) => (
+                        render={() => (
                           <FormItem>
-                            <FormLabel className="text-lg">What is your business industry?</FormLabel>
-                            <FormControl>
-                              <RadioGroup
-                                onValueChange={(value) => {
-                                  field.onChange(value)
-                                  if (value !== "Other") {
-                                    form.setValue("businessIndustryOther", "")
-                                  }
-                                }}
-                                value={field.value}
-                                className="flex flex-col space-y-2 mt-4 text-zinc-400"
-                              >
-                                {[
-                                  "Technology",
-                                  "E-commerce",
-                                  "Healthcare",
-                                  "Education",
-                                  "Finance",
-                                  "Real Estate",
-                                  "Entertainment",
-                                  "Travel and Hospitality",
-                                  "Retail",
-                                  "Other",
-                                ].map((option) => (
-                                  <FormItem key={option} className="flex items-center space-x-3 space-y-0">
-                                    <FormControl>
-                                      <RadioGroupItem value={option} />
-                                    </FormControl>
-                                    <FormLabel className="font-normal text-base">{option}</FormLabel>
-                                  </FormItem>
-                                ))}
-                              </RadioGroup>
-                            </FormControl>
+                            <FormLabel className="text-lg">
+                              What is your business industry? (Select all that apply)
+                            </FormLabel>
+                            <div className="space-y-2 mt-4">
+                              {[
+                                "Technology",
+                                "E-commerce",
+                                "Healthcare",
+                                "Education",
+                                "Finance",
+                                "Real Estate",
+                                "Entertainment",
+                                "Travel and Hospitality",
+                                "Retail",
+                                "Other",
+                              ].map((item) => (
+                                <FormField
+                                  key={item}
+                                  control={form.control}
+                                  name="businessIndustry"
+                                  render={({ field }) => {
+                                    return (
+                                      <FormItem key={item} className="flex flex-row items-start space-x-3 space-y-0">
+                                        <FormControl>
+                                          <Checkbox
+                                            checked={field.value?.includes(item)}
+                                            onCheckedChange={(checked) => {
+                                              const currentValue = field.value || []
+                                              return checked
+                                                ? field.onChange([...currentValue, item])
+                                                : field.onChange(currentValue.filter((value) => value !== item))
+                                            }}
+                                          />
+                                        </FormControl>
+                                        <FormLabel className="font-normal text-base text-zinc-400">{item}</FormLabel>
+                                      </FormItem>
+                                    )
+                                  }}
+                                />
+                              ))}
+                            </div>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
 
-                      {form.watch("businessIndustry") === "Other" && (
+                      {form.watch("businessIndustry")?.includes("Other") && (
                         <FormField
                           control={form.control}
                           name="businessIndustryOther"
@@ -369,45 +383,53 @@ export default function Home() {
                       <FormField
                         control={form.control}
                         name="targetAudience"
-                        render={({ field }) => (
+                        render={() => (
                           <FormItem>
-                            <FormLabel className="text-lg">Who is your target audience?</FormLabel>
-                            <FormControl>
-                              <RadioGroup
-                                onValueChange={(value) => {
-                                  field.onChange(value)
-                                  if (value !== "Other") {
-                                    form.setValue("targetAudienceOther", "")
-                                  }
-                                }}
-                                value={field.value}
-                                className="flex flex-col space-y-2 mt-4 text-zinc-400"
-                              >
-                                {[
-                                  "Businesses (B2B)",
-                                  "Individual Consumers (B2C)",
-                                  "Students",
-                                  "Professionals",
-                                  "Small and Medium Enterprises (SMEs)",
-                                  "Large Corporations",
-                                  "Non-Profit Organizations",
-                                  "Other",
-                                ].map((option) => (
-                                  <FormItem key={option} className="flex items-center space-x-3 space-y-0">
-                                    <FormControl>
-                                      <RadioGroupItem value={option} />
-                                    </FormControl>
-                                    <FormLabel className="font-normal text-base">{option}</FormLabel>
-                                  </FormItem>
-                                ))}
-                              </RadioGroup>
-                            </FormControl>
+                            <FormLabel className="text-lg">
+                              Who is your target audience? (Select all that apply)
+                            </FormLabel>
+                            <div className="space-y-2 mt-4">
+                              {[
+                                "Businesses (B2B)",
+                                "Individual Consumers (B2C)",
+                                "Students",
+                                "Professionals",
+                                "Small and Medium Enterprises (SMEs)",
+                                "Large Corporations",
+                                "Non-Profit Organizations",
+                                "Other",
+                              ].map((item) => (
+                                <FormField
+                                  key={item}
+                                  control={form.control}
+                                  name="targetAudience"
+                                  render={({ field }) => {
+                                    return (
+                                      <FormItem key={item} className="flex flex-row items-start space-x-3 space-y-0">
+                                        <FormControl>
+                                          <Checkbox
+                                            checked={field.value?.includes(item)}
+                                            onCheckedChange={(checked) => {
+                                              const currentValue = field.value || []
+                                              return checked
+                                                ? field.onChange([...currentValue, item])
+                                                : field.onChange(currentValue.filter((value) => value !== item))
+                                            }}
+                                          />
+                                        </FormControl>
+                                        <FormLabel className="font-normal text-base text-zinc-400">{item}</FormLabel>
+                                      </FormItem>
+                                    )
+                                  }}
+                                />
+                              ))}
+                            </div>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
 
-                      {form.watch("targetAudience") === "Other" && (
+                      {form.watch("targetAudience")?.includes("Other") && (
                         <FormField
                           control={form.control}
                           name="targetAudienceOther"
@@ -526,7 +548,6 @@ export default function Home() {
                           </FormItem>
                         )}
                       />
-
                       <FormField
                         control={form.control}
                         name="joinWishlist"
@@ -545,13 +566,13 @@ export default function Home() {
                                   <FormControl>
                                     <RadioGroupItem value="yes" />
                                   </FormControl>
-                                  <FormLabel className="font-normal text-base">Yes</FormLabel>
+                                  <FormLabel className="font-normal text-base text-zinc-400">Yes</FormLabel>
                                 </FormItem>
                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                   <FormControl>
                                     <RadioGroupItem value="no" />
                                   </FormControl>
-                                  <FormLabel className="font-normal text-base">No</FormLabel>
+                                  <FormLabel className="font-normal text-base text-zinc-400">No</FormLabel>
                                 </FormItem>
                               </RadioGroup>
                             </FormControl>

@@ -7,9 +7,12 @@ const BusinessFormSchema = new mongoose.Schema(
     email: { type: String, required: true },
     phone: { type: String, required: true },
     hasWebsite: { type: String, enum: ["yes", "no"], required: true },
-    websiteUse: { type: String },
-    businessIndustry: { type: String },
-    targetAudience: { type: String },
+    websiteUse: [{ type: String }],
+    websiteUseOther: { type: String },
+    businessIndustry: [{ type: String }],
+    businessIndustryOther: { type: String },
+    targetAudience: [{ type: String }],
+    targetAudienceOther: { type: String },
     challenges: [{ type: String }],
     implementedStrategies: { type: String, enum: ["yes", "no"] },
     campaigns: { type: String, enum: ["yes", "no"] },
@@ -21,5 +24,7 @@ const BusinessFormSchema = new mongoose.Schema(
   { timestamps: true },
 )
 
-export default mongoose.models.BusinessForm || mongoose.model("BusinessForm", BusinessFormSchema)
+const BusinessForm = mongoose.models.BusinessForm || mongoose.model("BusinessForm", BusinessFormSchema)
+
+export default BusinessForm
 
